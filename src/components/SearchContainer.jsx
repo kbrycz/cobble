@@ -126,7 +126,7 @@ export default function SearchContainer() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-start pt-32 min-h-[calc(100vh-10rem)]">
+    <div className="flex flex-col items-center justify-start pt-8 min-h-[calc(100vh-10rem)]">
       <AnimatePresence>
         {!showContent && !isLoading && (
           <HomeScreenSkeleton />
@@ -138,14 +138,14 @@ export default function SearchContainer() {
           <motion.div
             initial={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="w-full"
+            className="w-full max-w-[95vw] mx-auto"
           >
-            <div className="w-full max-w-2xl px-4 space-y-8 mx-auto">
+            <div className="w-full max-w-[95%] sm:max-w-2xl space-y-6 sm:space-y-8 mx-auto">
               <div className="text-center space-y-4 relative z-10">
-                <h1 className="text-6xl font-bold tracking-tight">
+                <h1 className="text-4xl sm:text-6xl font-bold tracking-tight">
                   <AuroraText>Cobble</AuroraText>
                 </h1>
-                <p className="text-xl text-gray-600 dark:text-gray-400 max-w-lg mx-auto mb-8">
+                <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-400 max-w-[95%] sm:max-w-lg mx-auto mb-4 sm:mb-8">
                   The best place to explore and analyze U.S. Census Bureau data
                 </p>
               </div>
@@ -166,7 +166,7 @@ export default function SearchContainer() {
                       inputRef.current.setValue("");
                     }
                   }}
-                  className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition-colors relative"
+                  className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition-colors relative text-sm sm:text-base px-4 sm:px-0"
                 >
                   {isAiSearch ? (
                     <IconSearch className="mr-2 inline-block w-5 h-5 text-indigo-600 dark:text-indigo-400" />
@@ -186,21 +186,21 @@ export default function SearchContainer() {
                 </button>
               </div>
               {!isAiSearch && (
-                <div className="relative mt-16">
+                <div className="relative mt-8 sm:mt-16 w-full max-w-[95vw] mx-auto overflow-hidden">
                   <Marquee className="[--duration:30s]">
                     {features.map((feature) => (
                       <div
                         onClick={() => router.push(feature.href)}
                         key={feature.title}
-                        className="mx-4 w-80 p-4 rounded-xl backdrop-blur-sm border border-gray-200 dark:border-gray-800 cursor-pointer hover:bg-indigo-500/10 dark:hover:bg-indigo-500/20 transition-colors duration-200 bg-white/50 dark:bg-gray-800/50"
+                        className="mx-2 sm:mx-4 w-[280px] sm:w-80 p-3 sm:p-4 rounded-xl backdrop-blur-sm border border-gray-200 dark:border-gray-800 cursor-pointer hover:bg-indigo-500/10 dark:hover:bg-indigo-500/20 transition-colors duration-200 bg-white/50 dark:bg-gray-800/50"
                       >
                         <div className="flex items-center gap-3 mb-2">
                           <span className="text-2xl">{feature.icon}</span>
-                          <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                          <span className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">
                             {feature.title}
                           </span>
                         </div>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                        <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
                           {feature.description}
                         </p>
                       </div>
@@ -209,21 +209,21 @@ export default function SearchContainer() {
                 </div>
               )}
               {isAiSearch && (
-                <div className="relative mt-16">
+                <div className="relative mt-8 sm:mt-16 w-full max-w-[95vw] mx-auto overflow-hidden">
                   <Marquee className="[--duration:40s]">
                     {exampleSearches.map((search) => (
                       <div
                         key={search.query}
                         onClick={() => inputRef.current?.setValue(search.query)}
-                        className="mx-4 w-80 p-4 rounded-xl backdrop-blur-sm border border-gray-200 dark:border-gray-800 cursor-pointer hover:bg-indigo-500/10 dark:hover:bg-indigo-500/20 transition-colors duration-200 bg-white/50 dark:bg-gray-800/50"
+                        className="mx-2 sm:mx-4 w-[280px] sm:w-80 p-3 sm:p-4 rounded-xl backdrop-blur-sm border border-gray-200 dark:border-gray-800 cursor-pointer hover:bg-indigo-500/10 dark:hover:bg-indigo-500/20 transition-colors duration-200 bg-white/50 dark:bg-gray-800/50"
                       >
                         <div className="flex items-center gap-3 mb-2">
                           <span className="text-2xl">{search.icon}</span>
-                          <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                          <span className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">
                             {search.category}
                           </span>
                         </div>
-                        <p className="text-sm text-gray-900 dark:text-gray-100 line-clamp-2">
+                        <p className="text-xs sm:text-sm text-gray-900 dark:text-gray-100 line-clamp-2">
                           {search.query}
                         </p>
                       </div>

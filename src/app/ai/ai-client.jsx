@@ -273,11 +273,11 @@ export default function AIClient() {
 
   return (
     <main>
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-[95%] sm:max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="space-y-6">
           <div className="space-y-2">
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">AI Assisted Results</h1>
-            <p className="text-gray-600 dark:text-gray-400">
+            <p className="text-gray-600 dark:text-gray-400 max-w-[95%] mx-auto">
               Get precise insights by asking questions in plain English. Our AI understands your intent and delivers exactly what you're looking for.
             </p>
           </div>
@@ -287,7 +287,7 @@ export default function AIClient() {
             isLoading={isLoading}
             ref={inputRef}
             onSubmit={handleSearch}
-            className="relative z-10 bg-transparent max-w-none"
+            className="relative z-10 bg-transparent max-w-[95%] mx-auto"
             isAiMode={true}
           />
         </div>

@@ -186,9 +186,10 @@ const PlaceholdersAndVanishInput = React.forwardRef(({
   return (
     <form
       className={cn(
-        "w-full relative bg-white/50 dark:bg-zinc-800/50 backdrop-blur-sm overflow-hidden shadow-[0px_2px_3px_-1px_rgba(0,0,0,0.1),_0px_1px_0px_0px_rgba(25,28,33,0.02),_0px_0px_0px_1px_rgba(25,28,33,0.08)] transition-all duration-300 rounded-xl",
+        "w-full max-w-[95%] relative bg-white/50 dark:bg-zinc-800/50 backdrop-blur-sm overflow-hidden shadow-[0px_2px_3px_-1px_rgba(0,0,0,0.1),_0px_1px_0px_0px_rgba(25,28,33,0.02),_0px_0px_0px_1px_rgba(25,28,33,0.08)] transition-all duration-300 rounded-xl",
         isAiMode ? "min-h-[8rem] h-auto" : "h-12",
-        value && "bg-gray-50/50"
+        value && "bg-gray-50/50",
+        "mx-auto"
       )}
       onSubmit={handleSubmit}>
       <canvas
@@ -214,7 +215,7 @@ const PlaceholdersAndVanishInput = React.forwardRef(({
           value={value}
           className={cn(
             "w-full relative text-sm sm:text-base z-50 border-none dark:text-white bg-transparent text-black focus:outline-none focus:ring-0 pl-4 pr-20 rounded-xl block overflow-hidden",
-            "pt-4 pb-12 min-h-[8rem]",
+            "pt-4 pb-12 min-h-[8rem] px-3 sm:px-4",
             "resize-none placeholder:text-neutral-500 dark:placeholder:text-zinc-500 whitespace-pre-wrap",
             animating && "text-transparent dark:text-transparent"
           )}
@@ -238,7 +239,7 @@ const PlaceholdersAndVanishInput = React.forwardRef(({
           value={value}
           type="text"
           className={cn(
-            "w-full h-12 relative text-sm sm:text-base z-50 border-none dark:text-white bg-transparent text-black focus:outline-none focus:ring-0 pl-4 sm:pl-10 pr-20 rounded-xl",
+            "w-full h-12 relative text-sm sm:text-base z-50 border-none dark:text-white bg-transparent text-black focus:outline-none focus:ring-0 pl-3 sm:pl-10 pr-16 sm:pr-20 rounded-xl",
             animating && "text-transparent dark:text-transparent"
           )}
           placeholder=""

@@ -29,7 +29,8 @@ import {
   SparklesIcon,
 } from "@heroicons/react/24/outline";
 
-import { ChevronDownIcon, MagnifyingGlassIcon } from "@heroicons/react/20/solid";
+import { ChevronDownIcon } from "@heroicons/react/20/solid";
+import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 
 const navigation = [
   { name: "Home", href: "/", icon: HomeIcon, current: true },
@@ -97,6 +98,7 @@ export default function Sidebar({ children }) {
 
   const handleNavigation = (href, e) => {
     e.preventDefault();
+    setSidebarOpen(false);
     router.replace(href);
   };
 
@@ -164,7 +166,7 @@ export default function Sidebar({ children }) {
                 <ul role="list" className="flex flex-1 flex-col gap-y-7">
                   <li>
                     <ul role="list" className="-mx-2 space-y-1">
-                      {navigation.map((item) => (
+                      {navigation.filter(item => item.name !== "AI Assisted Results" || showAiButton).map((item) => (
                         <li key={item.name}>
                           <a
                             href={item.href}
@@ -198,7 +200,10 @@ export default function Sidebar({ children }) {
                   </li>
                   <li className="mt-auto">
                     <button
-                      onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                      onClick={() => {
+                        setTheme(theme === "dark" ? "light" : "dark");
+                        setSidebarOpen(false);
+                      }}
                       className="group -mx-2 flex w-full gap-x-3 p-2 text-sm font-semibold text-gray-700 dark:text-gray-200 hover:text-indigo-600 dark:hover:text-indigo-300"
                     >
                       <span className="h-6 w-6 shrink-0">
@@ -212,6 +217,7 @@ export default function Sidebar({ children }) {
                     </button>
                     <a
                       href="#"
+                      onClick={() => setSidebarOpen(false)}
                       className="group -mx-2 flex gap-x-3 p-2 text-sm font-semibold text-gray-700 dark:text-gray-200 hover:text-indigo-600 dark:hover:text-indigo-300"
                     >
                       <span className="h-6 w-6 shrink-0">
@@ -359,8 +365,6 @@ export default function Sidebar({ children }) {
               <span className="sr-only">Open sidebar</span>
               <Bars3Icon aria-hidden="true" className="h-6 w-6" />
             </button>
-            {/* Separator */}
-            <div aria-hidden="true" className="h-6 w-px bg-gray-200 lg:hidden" />
 
             {/* Search bar */}
             <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
@@ -383,7 +387,7 @@ export default function Sidebar({ children }) {
               >
                 <MagnifyingGlassIcon
                   aria-hidden="true"
-                  className={`pointer-events-none absolute left-3 h-5 w-5 text-gray-400 ${pathname === '/' || pathname === '/ai' ? 'opacity-0' : ''}`}
+                  className={`pointer-events-none absolute left-3 h-5 w-5 text-gray-400 dark:text-gray-500 ${pathname === '/' || pathname === '/ai' ? 'opacity-0' : ''}`}
                 />
                 <input
                   name="search"
