@@ -5,10 +5,9 @@ import { PlaceholdersAndVanishInput } from "@/components/ui/placeholders-and-van
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { AuroraText } from "@/components/ui/aurora-text";
+import { LoadingScreen } from "@/components/ui/loading-screen";
 import { cn } from "@/lib/utils";
-import { LoadingScreen } from "@/components/ui/loading";
 import { Marquee } from "@/components/ui/marquee";
-import { HomeScreenSkeleton } from "@/components/ui/skeletons";
 import { AnimatePresence } from "framer-motion";
 import { useSearchStore } from "@/lib/store";
 import { IconSparkles, IconSearch } from "@tabler/icons-react";
@@ -128,12 +127,7 @@ export default function SearchContainer() {
   return (
     <div className="flex flex-col items-center justify-start pt-8 min-h-[calc(100vh-10rem)]">
       <AnimatePresence>
-        {!showContent && !isLoading && (
-          <HomeScreenSkeleton />
-        )}
-        {isLoading && (
-          <LoadingScreen />
-        )}
+        {isLoading && <LoadingScreen />}
         {showContent && !isLoading && (
           <motion.div
             initial={{ opacity: 1 }}

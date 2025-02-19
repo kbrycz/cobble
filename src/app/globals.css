@@ -76,3 +76,23 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+/* Theme transition handling */
+.theme-transition,
+.theme-transition *,
+.theme-transition *::before,
+.theme-transition *::after {
+  transition: background-color 0.2s ease-in-out, 
+              color 0.2s ease-in-out,
+              border-color 0.2s ease-in-out,
+              fill 0.2s ease-in-out,
+              stroke 0.2s ease-in-out !important;
+}
+
+/* Prevent transition on page load */
+.no-transition,
+.no-transition *,
+.no-transition *::before,
+.no-transition *::after {
+  transition: none !important;
+}

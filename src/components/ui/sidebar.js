@@ -5,19 +5,19 @@ import { useRouter, usePathname } from "next/navigation";
 import { useTheme } from "@/components/providers/theme-provider";
 import { useSearchStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
-import { useState as useHookState } from "react";
 import { AuroraText } from "@/components/ui/aurora-text";
 import { BentoGridSkeleton } from "@/components/ui/skeletons";
-import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/20/solid";
+import { Dialog } from "@headlessui/react";
+import { Footer } from "@/components/ui/footer";
 import { DotPattern } from "@/components/ui/dot-pattern";
-import { Dialog, Transition, Menu } from "@headlessui/react";
-import { Fragment } from "react";
+import { HelpDialog } from "@/components/ui/help-dialog";
 
 import {
   Bars3Icon,
-  BellIcon,
   Cog6ToothIcon,
   HomeIcon,
+  MagnifyingGlassIcon,
+  QuestionMarkCircleIcon,
   SunIcon,
   MoonIcon,
   XMarkIcon,
@@ -28,9 +28,6 @@ import {
   HeartIcon,
   SparklesIcon,
 } from "@heroicons/react/24/outline";
-
-import { ChevronDownIcon } from "@heroicons/react/20/solid";
-import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 
 const navigation = [
   { name: "Home", href: "/", icon: HomeIcon, current: true },
@@ -78,11 +75,6 @@ const navigation = [
   },
 ];
 
-const userNavigation = [
-  { name: "Your profile", href: "#" },
-  { name: "Sign out", href: "#" },
-];
-
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
@@ -90,8 +82,9 @@ function classNames(...classes) {
 export default function Sidebar({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(true);
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { searchQuery, currentSearch, aiSearchQuery, aiCurrentSearch, setSearchQuery, setCurrentSearch, showAiButton } = useSearchStore();
+  const { searchQuery, currentSearch, aiSearchQuery, aiCurrentSearch, setSearchQuery, setCurrentSearch, showAiButton, isAuthenticated, setIsAuthenticated } = useSearchStore();
   const router = useRouter();
   const pathname = usePathname();
   const { theme, setTheme } = useTheme();
@@ -107,52 +100,21 @@ export default function Sidebar({ children }) {
       <Dialog
         open={sidebarOpen}
         onClose={setSidebarOpen}
-        as="div"
-        className="relative z-50 lg:hidden" 
-      >
-        <Transition.Child
-          as={Fragment}
-          enter="transition-opacity ease-linear duration-300"
-          enterFrom="opacity-0"
-          enterTo="opacity-100"
-          leave="transition-opacity ease-linear duration-300"
-          leaveFrom="opacity-100"
-          leaveTo="opacity-0"
-        >
-          <div className="fixed inset-0 bg-gray-900/80" />
-        </Transition.Child>
+        className="relative z-50 lg:hidden">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-[2px]" />
 
         <div className="fixed inset-0 flex">
-          <Transition.Child
-            as={Fragment}
-            enter="transition ease-in-out duration-300 transform"
-            enterFrom="-translate-x-full"
-            enterTo="translate-x-0"
-            leave="transition ease-in-out duration-300 transform"
-            leaveFrom="translate-x-0"
-            leaveTo="-translate-x-full"
-          >
-            <Dialog.Panel className="relative mr-16 flex w-full max-w-xs flex-1">
-              <Transition.Child
-                as={Fragment}
-                enter="ease-in-out duration-300"
-                enterFrom="opacity-0"
-                enterTo="opacity-100"
-                leave="ease-in-out duration-300"
-                leaveFrom="opacity-100"
-                leaveTo="opacity-0"
+          <Dialog.Panel className="relative mr-16 flex w-full max-w-xs flex-1">
+            <div className="absolute left-full top-0 flex w-16 justify-center pt-5">
+              <button
+                type="button"
+                onClick={() => setSidebarOpen(false)}
+                className="-m-2.5 p-2.5"
               >
-                <div className="absolute left-full top-0 flex w-16 justify-center pt-5">
-                  <button
-                    type="button"
-                    onClick={() => setSidebarOpen(false)}
-                    className="-m-2.5 p-2.5"
-                  >
-                    <span className="sr-only">Close sidebar</span>
-                    <XMarkIcon className="h-6 w-6 text-white" aria-hidden="true" />
-                  </button>
-                </div>
-              </Transition.Child>
+                <span className="sr-only">Close sidebar</span>
+                <XMarkIcon className="h-6 w-6 text-white" aria-hidden="true" />
+              </button>
+            </div>
             {/* Sidebar component for mobile */}
             <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-white dark:bg-gray-900 px-6 pb-4">
               <div className="flex h-16 shrink-0 items-center">
@@ -166,7 +128,10 @@ export default function Sidebar({ children }) {
                 <ul role="list" className="flex flex-1 flex-col gap-y-7">
                   <li>
                     <ul role="list" className="-mx-2 space-y-1">
-                      {navigation.filter(item => item.name !== "AI Assisted Results" || showAiButton).map((item) => (
+                      {navigation.filter(item => {
+                        if (item.name === "AI Assisted Results" && !showAiButton) return false;
+                        return true;
+                      }).map((item) => (
                         <li key={item.name}>
                           <a
                             href={item.href}
@@ -216,8 +181,8 @@ export default function Sidebar({ children }) {
                       {theme === "dark" ? "Light Mode" : "Dark Mode"}
                     </button>
                     <a
-                      href="#"
-                      onClick={() => setSidebarOpen(false)}
+                      href="/settings"
+                      onClick={(e) => handleNavigation("/settings", e)}
                       className="group -mx-2 flex gap-x-3 p-2 text-sm font-semibold text-gray-700 dark:text-gray-200 hover:text-indigo-600 dark:hover:text-indigo-300"
                     >
                       <span className="h-6 w-6 shrink-0">
@@ -226,20 +191,24 @@ export default function Sidebar({ children }) {
                           className="h-6 w-6 text-gray-400 dark:text-gray-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-300"
                         />
                       </span>
-                      Settings
+                      <span className={classNames(
+                        "transition-opacity duration-300",
+                        isCollapsed ? "opacity-0 group-hover:opacity-100 whitespace-nowrap" : "opacity-100"
+                      )}>
+                        Settings
+                      </span>
                     </a>
                   </li>
                 </ul>
               </nav>
             </div>
-            </Dialog.Panel>
-          </Transition.Child>
+          </Dialog.Panel>
         </div>
       </Dialog>
 
       {/* Static sidebar for desktop */}
       <div className={classNames(
-        "hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:flex-col transition-all duration-300 bg-white dark:bg-gray-900",
+        "hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:flex-col bg-white dark:bg-gray-900",
         isCollapsed ? "lg:w-20 group hover:lg:w-72" : "lg:w-72"
       )}>
         {/* Sidebar component for desktop */}
@@ -255,7 +224,10 @@ export default function Sidebar({ children }) {
             <ul role="list" className="flex flex-1 flex-col gap-y-7">
               <li>
                 <ul role="list" className="-mx-2 space-y-1">
-                  {navigation.filter(item => item.name !== "AI Assisted Results" || showAiButton).map((item) => (
+                  {navigation.filter(item => {
+                    if (item.name === "AI Assisted Results" && !showAiButton) return false;
+                    return true;
+                  }).map((item) => (
                     <li key={item.name}>
                       <a
                         href={item.href}
@@ -293,29 +265,9 @@ export default function Sidebar({ children }) {
                 </ul>
               </li>
               <li className="mt-auto">
-                <button
-                  onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                  className={classNames(
-                    "group -mx-2 flex gap-x-3 p-2 text-sm font-semibold text-gray-700 dark:text-gray-200 hover:text-indigo-600 dark:hover:text-indigo-300",
-                    isCollapsed ? "justify-center" : "w-full"
-                  )}
-                >
-                  <span className="h-6 w-6 shrink-0">
-                    {theme === "dark" ? (
-                      <SunIcon className="h-6 w-6 text-gray-400 dark:text-gray-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-300" />
-                    ) : (
-                      <MoonIcon className="h-6 w-6 text-gray-400 dark:text-gray-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-300" />
-                    )}
-                  </span>
-                  <span className={classNames(
-                    "transition-opacity duration-300",
-                    isCollapsed ? "opacity-0 group-hover:opacity-100 whitespace-nowrap" : "opacity-100"
-                  )}>
-                    {theme === "dark" ? "Light Mode" : "Dark Mode"}
-                  </span>
-                </button>
                 <a
-                  href="#"
+                  href="/settings"
+                  onClick={(e) => handleNavigation("/settings", e)}
                   className="group -mx-2 flex gap-x-3 p-2 text-sm font-semibold text-gray-700 dark:text-gray-200 hover:text-indigo-600 dark:hover:text-indigo-300"
                 >
                   <span className="h-6 w-6 shrink-0">
@@ -337,9 +289,9 @@ export default function Sidebar({ children }) {
         </div>
       </div>
 
-      {/* Content area to the right of the sidebar */}
+      {/* Content area */}
       <div className={classNames(
-        "transition-all duration-300 min-h-screen relative",
+        "min-h-screen relative",
         isCollapsed ? "lg:pl-20" : "lg:pl-72"
       )}>
         {/* Background dot pattern */}
@@ -369,7 +321,6 @@ export default function Sidebar({ children }) {
             {/* Search bar */}
             <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
               <form 
-                className={pathname === '/ai' ? 'hidden' : ''}
                 onSubmit={(e) => {
                   e.preventDefault();
                   const formData = new FormData(e.currentTarget);
@@ -383,11 +334,14 @@ export default function Sidebar({ children }) {
                     }, 1500);
                   }
                 }}
-                className="relative flex w-full items-center"
+                className={cn(
+                  "relative flex w-full items-center",
+                  pathname === '/' || pathname === '/ai' || pathname === '/pricing' ? 'opacity-0 pointer-events-none' : 'opacity-100'
+                )}
               >
                 <MagnifyingGlassIcon
                   aria-hidden="true"
-                  className={`pointer-events-none absolute left-3 h-5 w-5 text-gray-400 dark:text-gray-500 ${pathname === '/' || pathname === '/ai' ? 'opacity-0' : ''}`}
+                  className={`pointer-events-none absolute left-3 h-5 w-5 text-gray-400 dark:text-gray-500`}
                 />
                 <input
                   name="search"
@@ -397,82 +351,73 @@ export default function Sidebar({ children }) {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   aria-label="Search"
-                  className={cn(
-                    "block h-10 w-full rounded-md border-0 py-1.5 pl-10 pr-3 text-gray-900 dark:text-gray-100 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm ring-1 ring-inset ring-gray-200 dark:ring-gray-700 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6 disabled:opacity-50 disabled:cursor-not-allowed",
-                    (pathname === '/' || pathname === '/ai') && 'opacity-0 pointer-events-none'
-                  )}
+                  className="block h-10 w-full rounded-md border-0 py-1.5 pl-10 pr-3 text-gray-900 dark:text-gray-100 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm ring-1 ring-inset ring-gray-200 dark:ring-gray-700 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6 disabled:opacity-50 disabled:cursor-not-allowed"
                 />
                 {isLoading && (
                   <div className="absolute right-3 top-1/2 -translate-y-1/2">
                     <div className="h-4 w-4 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
                   </div>
                 )}
-                {currentSearch && !isLoading && pathname !== '/' && pathname !== '/ai' && (
-                  <div className="absolute -bottom-8 left-10 text-sm text-gray-600 dark:text-gray-400">
-                    Showing results for <AuroraText>{currentSearch}</AuroraText>
-                  </div>
-                )}
               </form>
-              <div className="flex items-center gap-x-4 lg:gap-x-6">
+              <div className="flex items-center gap-x-2 sm:gap-x-4">
+                <a
+                  href={pathname === "/pricing" ? "/" : "/pricing"}
+                  onClick={(e) => handleNavigation(pathname === "/pricing" ? "/" : "/pricing", e)}
+                  className="hidden sm:inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-indigo-600 dark:hover:text-indigo-300 whitespace-nowrap"
+                >
+                  {pathname === "/pricing" ? "Home" : "Pricing"}
+                </a>
+                {!isAuthenticated ? (
+                  <>
+                    {/* Sign In Button */}
+                    <button
+                      onClick={() => setIsAuthenticated(true)}
+                      className="hidden sm:inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-indigo-600 dark:hover:text-indigo-300 whitespace-nowrap"
+                    >
+                      Sign In
+                    </button>
+
+                    {/* Sign Up Button */}
+                    <button
+                      onClick={() => setIsAuthenticated(true)}
+                      className="hidden sm:inline-flex items-center px-4 py-2 text-sm font-medium text-indigo-600 dark:text-indigo-400 border border-indigo-600 dark:border-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950 rounded-lg transition-colors whitespace-nowrap"
+                    >
+                      Sign Up
+                    </button>
+                  </>
+                ) : (
+                  /* Sign Out Button */
+                  <button
+                    onClick={() => setIsAuthenticated(false)}
+                    className="hidden sm:inline-flex items-center px-4 py-2 text-sm font-medium text-indigo-600 dark:text-indigo-400 border border-indigo-600 dark:border-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950 rounded-lg transition-colors whitespace-nowrap"
+                  >
+                    Sign Out
+                  </button>
+                )}
+
+                {/* Theme Toggle */}
                 <button
                   type="button"
-                  className="-m-2.5 p-2.5 text-gray-400 dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-400"
+                  onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                  className="ml-2 p-2 text-gray-400 hover:text-gray-500 dark:text-gray-500 dark:hover:text-gray-400"
                 >
-                  <span className="sr-only">View notifications</span>
-                  <BellIcon aria-hidden="true" className="h-6 w-6" />
+                  <span className="sr-only">Toggle theme</span>
+                  {theme === "dark" ? (
+                    <SunIcon className="h-6 w-6" aria-hidden="true" />
+                  ) : (
+                    <MoonIcon className="h-6 w-6" aria-hidden="true" />
+                  )}
                 </button>
-                {/* Separator */}
-                <div
-                  aria-hidden="true"
-                  className="hidden lg:block lg:h-6 lg:w-px lg:bg-gray-200"
-                />
-                {/* Profile dropdown */}
-                <Menu as="div" className="relative">
-                  <div>
-                    <Menu.Button className="-m-1.5 flex items-center p-1.5">
-                    <span className="sr-only">Open user menu</span>
-                    <img
-                      alt=""
-                      src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                      className="h-8 w-8 rounded-full bg-gray-50 dark:bg-gray-800"
-                    />
-                    <span className="ml-4 hidden text-sm font-semibold text-gray-900 dark:text-gray-100 lg:block">
-                      Tom Cook
-                    </span>
-                    <ChevronDownIcon
-                      aria-hidden="true"
-                      className="ml-2 h-5 w-5 text-gray-400 dark:text-gray-500"
-                    />
-                    </Menu.Button>
-                  </div>
-                  <Transition
-                    as={Fragment}
-                    enter="transition ease-out duration-100"
-                    enterFrom="transform opacity-0 scale-95"
-                    enterTo="transform opacity-100 scale-100"
-                    leave="transition ease-in duration-75"
-                    leaveFrom="transform opacity-100 scale-100"
-                    leaveTo="transform opacity-0 scale-95"
-                  >
-                    <Menu.Items className="absolute right-0 z-10 mt-2.5 w-32 origin-top-right rounded-md bg-white dark:bg-gray-800 py-2 shadow-lg ring-1 ring-gray-900/5 dark:ring-gray-700/5 focus:outline-none">
-                      {userNavigation.map((item) => (
-                        <Menu.Item key={item.name}>
-                          {({ active }) => (
-                            <a
-                              href={item.href}
-                              className={classNames(
-                                active ? "bg-gray-50/50 dark:bg-gray-700/50 backdrop-blur-sm" : "",
-                                "block px-3 py-1 text-sm text-gray-900 dark:text-gray-100"
-                              )}
-                            >
-                              {item.name}
-                            </a>
-                          )}
-                        </Menu.Item>
-                      ))}
-                    </Menu.Items>
-                  </Transition>
-                </Menu>
+
+                {/* Help Button */}
+                <button
+                  type="button"
+                  onClick={() => setIsHelpOpen(true)}
+                  className="p-2 text-gray-400 hover:text-gray-500 dark:text-gray-500 dark:hover:text-gray-400"
+                >
+                  <span className="sr-only">View help</span>
+                  <QuestionMarkCircleIcon className="h-6 w-6" aria-hidden="true" />
+                </button>
               </div>
             </div>
           </div>
@@ -480,7 +425,7 @@ export default function Sidebar({ children }) {
 
         {/* Main content area */}
         <main className="relative z-10 flex flex-col min-h-[calc(100vh-4rem)]">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-8 relative">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-4 relative">
             {isLoading ? (
               <BentoGridSkeleton />
             ) : null}
@@ -489,8 +434,7 @@ export default function Sidebar({ children }) {
           <Footer />
         </main>
       </div>
+      <HelpDialog isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
     </div>
   );
 }
-
-import { Footer } from "@/components/ui/footer";

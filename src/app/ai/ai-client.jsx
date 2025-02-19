@@ -292,10 +292,9 @@ export default function AIClient() {
           />
         </div>
         <div className="space-y-6 relative mt-6">
-          {isLoading && (
+          {isLoading ? (
             <BentoGridSkeleton />
-          )}
-          {!isLoading && sections.map((section, sectionIndex) => (
+          ) : sections.map((section, sectionIndex) => (
             <div key={sectionIndex} className="space-y-2">
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{section.title}</h2>
               <BentoGrid className="mx-auto gap-4">

@@ -3,6 +3,7 @@ import { create } from 'zustand';
 export const useSearchStore = create((set) => ({
   searchQuery: '',
   aiSearchQuery: '',
+  isAuthenticated: false,
   currentSearch: '',
   aiCurrentSearch: '',
   showAiButton: false,
@@ -11,4 +12,5 @@ export const useSearchStore = create((set) => ({
   setCurrentSearch: (search) => set({ currentSearch: search }),
   setAiCurrentSearch: (search) => set({ aiCurrentSearch: search }),
   setShowAiButton: (show) => set({ showAiButton: show }),
+  setIsAuthenticated: (auth) => set({ isAuthenticated: auth }),
 }));

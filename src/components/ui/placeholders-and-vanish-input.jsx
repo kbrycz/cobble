@@ -249,7 +249,7 @@ const PlaceholdersAndVanishInput = React.forwardRef(({
         disabled={!value || isLoading}
         type="submit"
         className={cn(
-          "absolute right-2 z-50 h-8 w-8 rounded-full disabled:bg-gray-100 bg-black dark:bg-zinc-900 dark:disabled:bg-zinc-800 transition duration-200 grid place-items-center",
+          "absolute right-2 z-50 h-8 w-8 rounded-full disabled:bg-gray-100 bg-indigo-600 hover:bg-indigo-500 dark:bg-indigo-500 dark:hover:bg-indigo-400 dark:disabled:bg-zinc-800 transition duration-200 grid place-items-center",
           isAiMode ? "bottom-2" : "top-1/2 -translate-y-1/2"
         )}>
         {isLoading ? (
@@ -265,7 +265,7 @@ const PlaceholdersAndVanishInput = React.forwardRef(({
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
-          className="text-gray-300 h-4 w-4 -translate-x-[1px]">
+          className="text-white h-4 w-4 -translate-x-[1px]">
           <path stroke="none" d="M0 0h24v24H0z" fill="none" />
           <motion.path
             d="M5 12l14 0"

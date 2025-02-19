@@ -1,13 +1,16 @@
+import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 
-export function LoadingScreen() {
+export function LoadingScreen({ className }) {
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-white dark:bg-gray-900"
-    >
+      className={cn(
+        "fixed inset-0 z-50 flex items-center justify-center bg-white dark:bg-gray-900 transition-opacity duration-300",
+        className
+      )}>
       <div className="relative flex flex-col items-center">
         <motion.div
           initial={{ scale: 0.5, opacity: 0 }}

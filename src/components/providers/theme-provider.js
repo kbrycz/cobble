@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState, useCallback } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 
 const ThemeContext = createContext({ theme: "dark", setTheme: () => {} });
 
@@ -8,29 +8,37 @@ export function ThemeProvider({ children }) {
   const [theme, setThemeState] = useState("dark");
   const [mounted, setMounted] = useState(false);
 
-  // Initialize theme from localStorage and system preference
   useEffect(() => {
+    // Get theme from localStorage or system preference
     const storedTheme = localStorage.getItem("theme");
-    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    setThemeState(storedTheme || (prefersDark ? "dark" : "light"));
+    const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    const initialTheme = storedTheme || systemTheme;
+
+    // Set initial theme
+    document.documentElement.classList.add(initialTheme);
+    setThemeState(initialTheme);
     setMounted(true);
+
+    // Add transition class after initial render
+    const timeout = setTimeout(() => {
+      document.documentElement.classList.add("theme-transition");
+    }, 0);
+
+    return () => {
+      clearTimeout(timeout);
+      document.documentElement.classList.remove("theme-transition");
+    }
   }, []);
 
-  const setTheme = useCallback((newTheme) => {
+  const setTheme = (newTheme) => {
+    document.documentElement.classList.remove("light", "dark");
+    document.documentElement.classList.add(newTheme);
     setThemeState(newTheme);
     localStorage.setItem("theme", newTheme);
-  }, []);
+  };
 
-  useEffect(() => {
-    if (!mounted) return;
-
-    document.documentElement.classList.remove("dark", "light");
-    document.documentElement.classList.add(theme);
-  }, [theme, mounted]);
-
-  // Prevent flash of incorrect theme
   if (!mounted) {
-    return <>{children}</>;
+    return null;
   }
 
   return (
