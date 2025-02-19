@@ -1,12 +1,11 @@
-"use client";
+import { Suspense } from "react";
+import InfrastructureTransportationClient from "./infrastructure-transporation-client";
+import { BentoGridSkeleton } from "@/components/ui/skeletons";
 
-export default function InfrastructureTransportation() {
+export default function PeopleSociety() {
   return (
-    <div className="p-8">
-      <h1 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Infrastructure & Transportation</h1>
-      <p className="text-gray-700 dark:text-gray-300">
-        Transportation and Infrastructure Data
-      </p>
-    </div>
+    <Suspense fallback={<BentoGridSkeleton />}>
+      <InfrastructureTransportationClient />
+    </Suspense>
   );
 }

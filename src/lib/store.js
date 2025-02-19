@@ -1,16 +1,42 @@
-import { create } from 'zustand';
+import { create } from "zustand";
+import { createJSONStorage, persist } from "zustand/middleware";
 
-export const useSearchStore = create((set) => ({
-  searchQuery: '',
-  aiSearchQuery: '',
+const initialState = {
+  searchQuery: "",
+  aiSearchQuery: "",
   isAuthenticated: false,
-  currentSearch: '',
-  aiCurrentSearch: '',
+  currentSearch: "",
+  aiCurrentSearch: "",
   showAiButton: false,
-  setSearchQuery: (query) => set({ searchQuery: query }),
-  setAiSearchQuery: (query) => set({ aiSearchQuery: query }),
-  setCurrentSearch: (search) => set({ currentSearch: search }),
-  setAiCurrentSearch: (search) => set({ aiCurrentSearch: search }),
-  setShowAiButton: (show) => set({ showAiButton: show }),
-  setIsAuthenticated: (auth) => set({ isAuthenticated: auth }),
-}));
+  subscriptionLevel: "basic",
+};
+
+export const useSearchStore = create(
+  persist(
+    (set) => ({
+      ...initialState,
+      setSearchQuery: (query) => set({ searchQuery: query }),
+      setAiSearchQuery: (query) => set({ aiSearchQuery: query }),
+      setCurrentSearch: (search) => set({ currentSearch: search }),
+      setAiCurrentSearch: (search) => set({ aiCurrentSearch: search }),
+      setShowAiButton: (show) => set({ showAiButton: show }),
+      setIsAuthenticated: (auth) => set({ isAuthenticated: auth }),
+      reset: () => set(initialState),
+      setSubscriptionLevel: (level) => set({ subscriptionLevel: level }),
+    }),
+    {
+      name: "cobble-storage",
+      storage: createJSONStorage(() => {
+        // Only use localStorage on the client side
+        if (typeof window !== "undefined") {
+          return window.localStorage;
+        }
+        return {
+          getItem: () => null,
+          setItem: () => null,
+          removeItem: () => null,
+        };
+      }),
+    }
+  )
+);

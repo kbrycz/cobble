@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useTheme } from "@/components/providers/theme-provider";
+import { IconArrowRight, IconCrown } from "@tabler/icons-react";
+import { LoadingScreen } from "@/components/ui/loading-screen";
 import { useSearchStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import { AuroraText } from "@/components/ui/aurora-text";
@@ -16,7 +18,6 @@ import {
   Bars3Icon,
   Cog6ToothIcon,
   HomeIcon,
-  MagnifyingGlassIcon,
   QuestionMarkCircleIcon,
   SunIcon,
   MoonIcon,
@@ -84,19 +85,26 @@ export default function Sidebar({ children }) {
   const [isCollapsed, setIsCollapsed] = useState(true);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { searchQuery, currentSearch, aiSearchQuery, aiCurrentSearch, setSearchQuery, setCurrentSearch, showAiButton, isAuthenticated, setIsAuthenticated } = useSearchStore();
+  const { searchQuery, currentSearch, aiSearchQuery, aiCurrentSearch, setSearchQuery, setCurrentSearch, showAiButton, isAuthenticated, setIsAuthenticated, subscriptionLevel } = useSearchStore();
   const router = useRouter();
   const pathname = usePathname();
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme, isLoading: isThemeLoading } = useTheme();
+  const [isPending, setIsPending] = useState(false);
 
   const handleNavigation = (href, e) => {
     e.preventDefault();
     setSidebarOpen(false);
-    router.replace(href);
+    setIsPending(true);
+    window.scrollTo(0, 0);
+    router.prefetch(href);
+    router.push(href);
+    // Reset pending state after a short delay
+    setTimeout(() => setIsPending(false), 100);
   };
 
   return (
     <div className="h-full">
+      {isThemeLoading && <LoadingScreen />}
       <Dialog
         open={sidebarOpen}
         onClose={setSidebarOpen}
@@ -137,6 +145,7 @@ export default function Sidebar({ children }) {
                             href={item.href}
                             onClick={(e) => handleNavigation(item.href, e)}
                             className={classNames(
+                              isPending && "opacity-70",
                               pathname === item.href
                                 ? "text-indigo-600 dark:text-indigo-300"
                                 : "text-gray-700 dark:text-gray-200 hover:text-indigo-600 dark:hover:text-indigo-300",
@@ -164,22 +173,6 @@ export default function Sidebar({ children }) {
                     </ul>
                   </li>
                   <li className="mt-auto">
-                    <button
-                      onClick={() => {
-                        setTheme(theme === "dark" ? "light" : "dark");
-                        setSidebarOpen(false);
-                      }}
-                      className="group -mx-2 flex w-full gap-x-3 p-2 text-sm font-semibold text-gray-700 dark:text-gray-200 hover:text-indigo-600 dark:hover:text-indigo-300"
-                    >
-                      <span className="h-6 w-6 shrink-0">
-                        {theme === "dark" ? (
-                          <SunIcon className="h-6 w-6 text-gray-400 dark:text-gray-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-300" />
-                        ) : (
-                          <MoonIcon className="h-6 w-6 text-gray-400 dark:text-gray-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-300" />
-                        )}
-                      </span>
-                      {theme === "dark" ? "Light Mode" : "Dark Mode"}
-                    </button>
                     <a
                       href="/settings"
                       onClick={(e) => handleNavigation("/settings", e)}
@@ -191,10 +184,7 @@ export default function Sidebar({ children }) {
                           className="h-6 w-6 text-gray-400 dark:text-gray-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-300"
                         />
                       </span>
-                      <span className={classNames(
-                        "transition-opacity duration-300",
-                        isCollapsed ? "opacity-0 group-hover:opacity-100 whitespace-nowrap" : "opacity-100"
-                      )}>
+                      <span>
                         Settings
                       </span>
                     </a>
@@ -233,6 +223,7 @@ export default function Sidebar({ children }) {
                         href={item.href}
                         onClick={(e) => handleNavigation(item.href, e)}
                         className={classNames(
+                          isPending && "opacity-70",
                           pathname === item.href
                             ? "text-indigo-600 dark:text-indigo-300 hover:bg-transparent"
                             : "text-gray-700 dark:text-gray-200 hover:text-indigo-600 dark:hover:text-indigo-300",
@@ -321,67 +312,73 @@ export default function Sidebar({ children }) {
             {/* Search bar */}
             <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
               <form 
-                onSubmit={(e) => {
+                className={cn(
+                  "relative flex w-full items-center",
+                  pathname === '/' || pathname === '/ai' || pathname === '/pricing' || pathname === '/signin' || pathname === '/signup' || pathname === '/settings' ? 'opacity-0 pointer-events-none' : 'opacity-100'
+                )}
+                onSubmit={async (e) => {
                   e.preventDefault();
-                  const formData = new FormData(e.currentTarget);
-                  const search = formData.get('search');
-                  if (search) {
+                  if (searchQuery) {
                     setIsLoading(true);
-                    setSearchQuery(search);
-                    setCurrentSearch(search);
+                    setCurrentSearch(searchQuery);
                     setTimeout(() => {
                       setIsLoading(false);
                     }, 1500);
                   }
-                }}
-                className={cn(
-                  "relative flex w-full items-center",
-                  pathname === '/' || pathname === '/ai' || pathname === '/pricing' ? 'opacity-0 pointer-events-none' : 'opacity-100'
-                )}
-              >
-                <MagnifyingGlassIcon
-                  aria-hidden="true"
-                  className={`pointer-events-none absolute left-3 h-5 w-5 text-gray-400 dark:text-gray-500`}
-                />
+                }}>
                 <input
-                  name="search"
-                  type="search"
+                  type="text"
                   disabled={isLoading}
-                  placeholder="Search"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  aria-label="Search"
-                  className="block h-10 w-full rounded-md border-0 py-1.5 pl-10 pr-3 text-gray-900 dark:text-gray-100 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm ring-1 ring-inset ring-gray-200 dark:ring-gray-700 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6 disabled:opacity-50 disabled:cursor-not-allowed"
+                  placeholder="Enter a search term..."
+                  className={cn(
+                    "w-full h-10 relative text-sm z-50 border-none dark:text-white bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm text-black focus:outline-none focus:ring-0 pl-4 pr-12 rounded-lg shadow-[0px_2px_3px_-1px_rgba(0,0,0,0.1),0px_1px_0px_0px_rgba(25,28,33,0.02),0px_0px_0px_1px_rgba(25,28,33,0.08)]",
+                    "placeholder:text-gray-500 dark:placeholder:text-gray-400",
+                    "disabled:opacity-50 disabled:cursor-not-allowed"
+                  )}
                 />
-                {isLoading && (
-                  <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                    <div className="h-4 w-4 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
-                  </div>
-                )}
+                <button
+                  disabled={!searchQuery || isLoading}
+                  type="submit"
+                  className="absolute right-2 z-50 h-6 w-6 rounded-full disabled:bg-gray-100 bg-indigo-600 hover:bg-indigo-500 dark:bg-indigo-500 dark:hover:bg-indigo-400 dark:disabled:bg-gray-800 transition duration-200 grid place-items-center top-1/2 -translate-y-1/2">
+                  {isLoading ? (
+                    <div className="h-3 w-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <IconArrowRight className="h-3 w-3 text-white" stroke={2} />
+                  )}
+                </button>
               </form>
               <div className="flex items-center gap-x-2 sm:gap-x-4">
-                <a
-                  href={pathname === "/pricing" ? "/" : "/pricing"}
-                  onClick={(e) => handleNavigation(pathname === "/pricing" ? "/" : "/pricing", e)}
-                  className="hidden sm:inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-indigo-600 dark:hover:text-indigo-300 whitespace-nowrap"
-                >
-                  {pathname === "/pricing" ? "Home" : "Pricing"}
-                </a>
+                {isAuthenticated && subscriptionLevel === "pro" && (
+                  <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-indigo-600 dark:text-indigo-400 border border-indigo-600/20 dark:border-indigo-400/20 rounded-lg bg-indigo-50/50 dark:bg-indigo-950/50">
+                    <IconCrown size={16} className="text-indigo-600 dark:text-indigo-400" />
+                    <span>Pro</span>
+                  </div>
+                )}
+                {(!isAuthenticated || subscriptionLevel !== "pro") && (
+                  <a
+                    href={pathname === "/pricing" ? "/" : "/pricing"}
+                    onClick={(e) => handleNavigation(pathname === "/pricing" ? "/" : "/pricing", e)}
+                    className="hidden sm:inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-indigo-600 dark:hover:text-indigo-300 whitespace-nowrap"
+                    style={{ opacity: isPending ? 0.7 : 1 }}
+                  >
+                    {pathname === "/pricing" ? "Home" : "Pricing"}
+                  </a>
+                )}
                 {!isAuthenticated ? (
                   <>
                     {/* Sign In Button */}
                     <button
-                      onClick={() => setIsAuthenticated(true)}
-                      className="hidden sm:inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-indigo-600 dark:hover:text-indigo-300 whitespace-nowrap"
-                    >
+                      onClick={() => router.push("/signin")}
+                      className="hidden sm:inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-indigo-600 dark:hover:text-indigo-300 whitespace-nowrap">
                       Sign In
                     </button>
 
                     {/* Sign Up Button */}
                     <button
-                      onClick={() => setIsAuthenticated(true)}
-                      className="hidden sm:inline-flex items-center px-4 py-2 text-sm font-medium text-indigo-600 dark:text-indigo-400 border border-indigo-600 dark:border-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950 rounded-lg transition-colors whitespace-nowrap"
-                    >
+                      onClick={() => router.push("/signup")}
+                      className="hidden sm:inline-flex items-center px-4 py-2 text-sm font-medium text-indigo-600 dark:text-indigo-400 border border-indigo-600 dark:border-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950 rounded-lg transition-colors whitespace-nowrap">
                       Sign Up
                     </button>
                   </>
@@ -389,8 +386,7 @@ export default function Sidebar({ children }) {
                   /* Sign Out Button */
                   <button
                     onClick={() => setIsAuthenticated(false)}
-                    className="hidden sm:inline-flex items-center px-4 py-2 text-sm font-medium text-indigo-600 dark:text-indigo-400 border border-indigo-600 dark:border-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950 rounded-lg transition-colors whitespace-nowrap"
-                  >
+                    className="hidden sm:inline-flex items-center px-4 py-2 text-sm font-medium text-indigo-600 dark:text-indigo-400 border border-indigo-600 dark:border-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950 rounded-lg transition-colors whitespace-nowrap">
                     Sign Out
                   </button>
                 )}
@@ -401,7 +397,9 @@ export default function Sidebar({ children }) {
                   onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
                   className="ml-2 p-2 text-gray-400 hover:text-gray-500 dark:text-gray-500 dark:hover:text-gray-400"
                 >
-                  <span className="sr-only">Toggle theme</span>
+                  <span className="sr-only">
+                    {theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+                  </span>
                   {theme === "dark" ? (
                     <SunIcon className="h-6 w-6" aria-hidden="true" />
                   ) : (

@@ -5,10 +5,10 @@ import { BentoGrid, BentoGridItem } from "@/components/ui/bento-grid";
 import { Bar, BarChart, CartesianGrid, XAxis, Line, LineChart, Pie, PieChart, Cell } from "recharts";
 import { ChartContainer, ChartTooltip, ChartLegend, ChartTooltipContent, ChartLegendContent } from "@/components/ui/chart";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { useSearchStore } from "@/lib/store";
 import { useRouter } from "next/navigation";
+import { useSearchStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
-import { IconCrown, IconLock } from "@tabler/icons-react";
+import { IconCrown } from "@tabler/icons-react";
 import {
   IconArrowWaveRightUp,
   IconBoxAlignRightFilled,
@@ -92,7 +92,7 @@ function TeamChart({ expanded = false }) {
   const totalMembers = teamData.reduce((sum, data) => sum + data.members, 0);
   
   return (
-    <div className={`flex flex-col relative ${expanded ? 'h-[600px]' : 'h-full'} bg-white dark:bg-gray-900 rounded-lg p-4`}>
+    <div className={`flex flex-col ${expanded ? 'h-[600px]' : 'h-full'} bg-white dark:bg-gray-900 rounded-lg p-4`}>
       <div className="flex justify-between items-center mb-2">
         <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Team Distribution</h3>
         <p className="text-sm text-gray-500 dark:text-gray-400">January - June 2024</p>
@@ -122,7 +122,7 @@ function DocumentChart({ expanded = false }) {
   const totalDocuments = documentData.reduce((sum, data) => sum + data.documents, 0);
   
   return (
-    <div className={`flex flex-col relative ${expanded ? 'h-[600px]' : 'h-full'} bg-white dark:bg-gray-900 rounded-lg p-4`}>
+    <div className={`flex flex-col ${expanded ? 'h-[600px]' : 'h-full'} bg-white dark:bg-gray-900 rounded-lg p-4`}>
       <div className="flex justify-between items-center mb-2">
         <div>
           <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Documents Processed</h3>
@@ -163,7 +163,7 @@ function AnalyticsChart({ expanded = false }) {
   const totalPopulation = chartData.reduce((sum, data) => sum + data.desktop + data.mobile, 0);
   
   return (
-    <div className={`flex flex-col relative ${expanded ? 'h-[600px]' : 'h-full'} bg-white dark:bg-gray-900 rounded-lg p-4`}>
+    <div className={`flex flex-col ${expanded ? 'h-[600px]' : 'h-full'} bg-white dark:bg-gray-900 rounded-lg p-4`}>
       <div className="flex justify-between items-center mb-2">
         <div>
           <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Subscriptions</h3>
@@ -219,7 +219,7 @@ const items = [
   }
 ];
 
-export default function PeopleSocietyClient() {
+export default function EconomyWorkforceClient() {
   const [isExpanded, setIsExpanded] = useState(false);
   const router = useRouter();
   const { subscriptionLevel, isAuthenticated } = useSearchStore();
@@ -243,7 +243,7 @@ export default function PeopleSocietyClient() {
   return (
     <main className="py-10">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <h1 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">People & Society</h1>
+        <h1 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">Economy and Workforce</h1>
         <div className="space-y-12">
           {sections.map((section, sectionIndex) => (
             <div key={sectionIndex} className="space-y-4">

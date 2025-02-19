@@ -1,15 +1,11 @@
-"use client";
-import { useRouter } from "next/navigation";
+import { Suspense } from "react";
+import EconomyWorkforceClient from "./economy-workforce-client";
+import { BentoGridSkeleton } from "@/components/ui/skeletons";
 
-export default function EconomyWorkforce() {
-  const router = useRouter();
-
+export default function PeopleSociety() {
   return (
-    <div className="p-8">
-      <h1 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Economy & Workforce</h1>
-      <p className="text-gray-700 dark:text-gray-300">
-        Income and Earnings, Labor Force and Employment, Business and Economic Data, Consumer Spending and Poverty
-      </p>
-    </div>
+    <Suspense fallback={<BentoGridSkeleton />}>
+      <EconomyWorkforceClient />
+    </Suspense>
   );
 }

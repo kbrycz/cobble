@@ -186,10 +186,9 @@ const PlaceholdersAndVanishInput = React.forwardRef(({
   return (
     <form
       className={cn(
-        "w-full max-w-[95%] relative bg-white/50 dark:bg-zinc-800/50 backdrop-blur-sm overflow-hidden shadow-[0px_2px_3px_-1px_rgba(0,0,0,0.1),_0px_1px_0px_0px_rgba(25,28,33,0.02),_0px_0px_0px_1px_rgba(25,28,33,0.08)] transition-all duration-300 rounded-xl",
+        "w-full max-w-[95%] relative bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm overflow-hidden border border-gray-200 dark:border-gray-800 shadow-[0_1px_3px_0_rgb(0,0,0,0.1),0_1px_2px_-1px_rgb(0,0,0,0.1)] dark:shadow-[0_1px_3px_0_rgb(0,0,0,0.4),0_1px_2px_-1px_rgb(0,0,0,0.4)] transition-all duration-300 rounded-xl",
         isAiMode ? "min-h-[8rem] h-auto" : "h-12",
-        value && "bg-gray-50/50",
-        "mx-auto"
+        value && "bg-gray-50/50 dark:bg-gray-800/50"
       )}
       onSubmit={handleSubmit}>
       <canvas
@@ -239,7 +238,7 @@ const PlaceholdersAndVanishInput = React.forwardRef(({
           value={value}
           type="text"
           className={cn(
-            "w-full h-12 relative text-sm sm:text-base z-50 border-none dark:text-white bg-transparent text-black focus:outline-none focus:ring-0 pl-3 sm:pl-10 pr-16 sm:pr-20 rounded-xl",
+            "w-full h-12 relative text-sm sm:text-base z-50 border-none dark:text-white bg-transparent text-black focus:outline-none focus:ring-0 pl-4 pr-16 sm:pr-20 rounded-xl",
             animating && "text-transparent dark:text-transparent"
           )}
           placeholder=""
@@ -312,8 +311,8 @@ const PlaceholdersAndVanishInput = React.forwardRef(({
                 ease: "linear",
               }}
               className={cn(
-                "dark:text-zinc-500 text-sm sm:text-base font-normal text-neutral-500 pl-4 sm:pl-12 text-left w-[calc(100%-2rem)]",
-                isAiMode ? "whitespace-pre-wrap break-words pr-4 leading-relaxed py-4" : "truncate"
+                "dark:text-zinc-500 text-sm sm:text-base font-normal text-neutral-500 pl-4 text-left w-[calc(100%-2rem)] pointer-events-none",
+                isAiMode ? "whitespace-pre-wrap break-words pr-4 leading-relaxed" : "truncate"
               )}>
               {isAiMode ? aiPlaceholders[currentAiPlaceholder] : placeholders[currentPlaceholder]}
             </motion.p>

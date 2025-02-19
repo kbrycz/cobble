@@ -2,8 +2,16 @@ import "./globals.css";
 import Sidebar from "@/components/ui/sidebar";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { DotPattern } from "@/components/ui/dot-pattern";
-import { LoadingScreen } from "@/components/ui/loading";
+import { LoadingScreen } from "@/components/ui/loading-screen";
 import { Suspense } from "react";
+
+const themeScript = `
+  let isDark;
+  try {
+    isDark = localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)
+  } catch (_) {}
+  document.documentElement.classList[isDark ? 'add' : 'remove']('dark')
+`;
 
 export const metadata = {
   title: "Cobble",
@@ -12,21 +20,15 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" suppressHydrationWarning className="h-full dark">
+    <html lang="en" suppressHydrationWarning className="h-full">
+      <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
       <body className="h-full bg-background text-foreground">
         <ThemeProvider>
-          <div className="fixed inset-0 -z-10">
-            <DotPattern
-              width={20}
-              height={20}
-              cx={1}
-              cy={1}
-              cr={1}
-              className="[mask-image:radial-gradient(ellipse_at_center,white_30%,transparent_70%)] opacity-50"
-            />
-          </div>
           <Sidebar>
-            <Suspense fallback={<LoadingScreen />}>
+            <Suspense>
               {children}
             </Suspense>
           </Sidebar>

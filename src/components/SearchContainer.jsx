@@ -99,7 +99,7 @@ export default function SearchContainer() {
   const [isLoading, setIsLoading] = useState(false);
   const [showContent, setShowContent] = useState(false);
   const [isAiSearch, setIsAiSearch] = useState(false);
-  const { setSearchQuery, setAiSearchQuery, setCurrentSearch, setAiCurrentSearch, setShowAiButton } = useSearchStore();
+  const { setSearchQuery, setAiSearchQuery, setCurrentSearch, setAiCurrentSearch, setShowAiButton, subscriptionLevel } = useSearchStore();
   const inputRef = useRef(null);
 
   useEffect(() => {
@@ -111,17 +111,25 @@ export default function SearchContainer() {
     e.preventDefault();
     setIsLoading(true);
     setShowContent(false);
+
     if (isAiSearch) {
-      setAiSearchQuery(value);
-      setAiCurrentSearch(value);
-      setShowAiButton(true);
+      if (subscriptionLevel === "pro") {
+        setAiSearchQuery(value);
+        setAiCurrentSearch(value);
+        setShowAiButton(true);
+        setTimeout(() => {
+          router.push("/ai");
+        }, 3000);
+      } else {
+        router.push("/pricing");
+      }
     } else {
       setSearchQuery(value);
       setCurrentSearch(value);
+      setTimeout(() => {
+        router.push("/people-society");
+      }, 3000);
     }
-    setTimeout(() => {
-      router.push(isAiSearch ? "/ai" : "/people-society");
-    }, 3000);
   };
 
   return (

@@ -1,12 +1,11 @@
-"use client";
+import { Suspense } from "react";
+import HealthWellbeingClient from "./health-wellbeing-client";
+import { BentoGridSkeleton } from "@/components/ui/skeletons";
 
-export default function HealthWellbeing() {
+export default function PeopleSociety() {
   return (
-    <div className="p-8">
-      <h1 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Health & Well-being</h1>
-      <p className="text-gray-700 dark:text-gray-300">
-        Healthcare and Public Health Data
-      </p>
-    </div>
+    <Suspense fallback={<BentoGridSkeleton />}>
+      <HealthWellbeingClient />
+    </Suspense>
   );
 }

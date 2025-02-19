@@ -1,12 +1,11 @@
-"use client";
+import { Suspense } from "react";
+import HousingRealEstateClient from "./housing-real-estate-client";
+import { BentoGridSkeleton } from "@/components/ui/skeletons";
 
-export default function HousingRealEstate() {
+export default function PeopleSociety() {
   return (
-    <div className="p-8">
-      <h1 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Housing & Real Estate</h1>
-      <p className="text-gray-700 dark:text-gray-300">
-        Housing and Real Estate Data
-      </p>
-    </div>
+    <Suspense fallback={<BentoGridSkeleton />}>
+      <HousingRealEstateClient />
+    </Suspense>
   );
 }
